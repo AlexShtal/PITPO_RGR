@@ -1,4 +1,4 @@
-from Position import *
+from Position import Position
 
 
 class Food:

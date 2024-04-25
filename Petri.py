@@ -1,8 +1,8 @@
 import time
 import os
-from Bug import *
-from Food import *
-from Free import *
+from Bug import Bug
+from Food import Food
+from Free import Free
 from random import random
 
 
@@ -15,6 +15,7 @@ class Petri:
         self.simulation_speed = simulation_speed
         self.food_spawn_rate = food_spawn_rate
 
+    # Processes map
     def render(self):
         for y_index in range(len(self.items_map)):
             for x_index in range(len(self.items_map[0])):
@@ -30,7 +31,7 @@ class Petri:
                     case "Bug":
                         print("@", end=" ")
                     case "Food":
-                        print("*", end=" ")
+                        print(".", end=" ")
                     case "Free":
                         print(" ", end=" ")
             print()
@@ -56,18 +57,21 @@ class Petri:
                 x_pos = 0
                 y_pos += 1
 
+    # Makes all bugs non acted
     def clearActed(self):
         for line in self.items_map:
             for item in line:
                 if item.name == "Bug":
                     item.acted = False
 
+    # Starves bugs
     def starve(self):
         for line in self.items_map:
             for item in line:
                 if item.name == "Bug":
                     item.hunger -= 1
 
+    # Deletes starved bugs
     def clearStarved(self):
         for line in self.items_map:
             for item in line:
@@ -75,12 +79,14 @@ class Petri:
                     if item.hunger <= 1:
                         self.items_map[item.position.y][item.position.x] = Free(item.position.y, item.position.x)
 
+    # Spawns food
     def spawnFood(self):
         for line in self.items_map:
             for item in line:
                 if item.name == "Free" and random() < self.food_spawn_rate:
                     self.items_map[item.position.y][item.position.x] = Food(item.position.y, item.position.x)
 
+    # Checks if map empty of bugs
     def isEmpty(self):
         flag = True
         for line in self.items_map:
