@@ -1,20 +1,34 @@
-from Free import Free
+from sklearn.neural_network import MLPClassifier
+import numpy as np
+
 from Position import Position
-from random import choice
+
+from DefaultBehavior import DefaultBehavior
+
+from Actions import Actions
 
 
 class Bug:
     position: Position
     hunger = 10
     pregnant = False
-    name = "Bug"
     acted = False
 
-    def __init__(self, x, y):
+    behavior_model: MLPClassifier
+
+    def __init__(self, x, y, parent_model: MLPClassifier = None):
         self.position = Position(x, y)
         self.hunger = 5
 
-    # Processing possible steps according to bug position
+        model = DefaultBehavior.GetModel()
+
+        if parent_model:
+            parent_coefs = parent_model.coefs_
+            model.coefs_ = [array * np.random.normal(1, .1, size=array.shape) for array in parent_coefs]
+
+        self.behavior_model = model
+
+
     def getPossibleSteps(self, items_map: []):
         x_list = [self.position.x]
         y_list = [self.position.y]
@@ -37,16 +51,33 @@ class Bug:
 
         return x_list, y_list
 
-    def findNearestFood(self, items_map: []):
-        nearest_food_position = []
+    def get_surrounding_elements(self, items_map: []):
+        rows = len(items_map)
+        cols = len(items_map[0]) if rows > 0 else 0
+        row = self.position.y
+        col = self.position.x
+        surrounding_elements = []
 
-        x_list, y_list = self.getPossibleSteps(items_map)
-
-        for x in x_list:
-            for y in y_list:
-                if items_map[y][x].name == "Food":
-                    nearest_food_position.append(Position(x, y))
-        return nearest_food_position
+        # Проверяем соседние клетки вокруг заданной позиции (row, col)
+        for i in range(row - 1, row + 2):
+            for j in range(col - 1, col + 2):
+                # Проверяем, что индексы (i, j) в пределах границ матрицы
+                if 0 <= i < rows and 0 <= j < cols:
+                    # Исключаем сам элемент (row, col) из списка окружающих элементов
+                    if (i, j) != (row, col):
+                        neighbour = items_map[i][j]
+                        match neighbour.name:
+                            case "Free":
+                                surrounding_elements.append(1)
+                            case "GrassBug":
+                                surrounding_elements.append(2)
+                            case "MeatBug":
+                                surrounding_elements.append(3)
+                            case "Food":
+                                surrounding_elements.append(4)
+                else:
+                    surrounding_elements.append(0)
+        return surrounding_elements
 
     def findNearestFreeSpace(self, items_map: []):
         nearest_free_position = []
@@ -61,36 +92,3 @@ class Bug:
 
     def goToPosition(self, new_position: Position):
         self.position = new_position
-
-    def act(self, items_map: []):
-        nearest_food_positions = self.findNearestFood(items_map)
-        nearest_free_positions = self.findNearestFreeSpace(items_map)
-
-        # If food found nearby
-        if nearest_food_positions:
-            target = choice(nearest_food_positions)
-            items_map[self.position.y][self.position.x] = Free(self.position.x, self.position.y)
-            self.hunger = self.hunger + items_map[target.y][target.x].value % 10
-            self.goToPosition(target)
-            items_map[self.position.y][self.position.x] = self
-            self.acted = True
-        # If there is no food, step to free space
-        elif nearest_free_positions:
-            target = choice(nearest_free_positions)
-            items_map[self.position.y][self.position.x] = Free(self.position.x, self.position.y)
-            self.goToPosition(target)
-            items_map[self.position.y][self.position.x] = self
-            self.acted = True
-
-        # Birth new bug
-        if self.hunger >= 10 or self.pregnant:
-            nearest_free_positions = self.findNearestFreeSpace(items_map)
-            if nearest_free_positions:
-                target = choice(nearest_free_positions)
-                items_map[target.y][target.x] = Bug(target.x, target.y)
-                self.hunger = self.hunger - 5
-                self.pregnant = False
-            else:
-                self.pregnant = True
-
-        return items_map
