@@ -28,7 +28,7 @@ class Bug:
 
         self.behavior_model = model
 
-
+    # Returns possible steps for bug
     def getPossibleSteps(self, items_map: []):
         x_list = [self.position.x]
         y_list = [self.position.y]
@@ -51,6 +51,7 @@ class Bug:
 
         return x_list, y_list
 
+    # Returns elements that bug can see
     def get_surrounding_elements(self, items_map: []):
         rows = len(items_map)
         cols = len(items_map[0]) if rows > 0 else 0
@@ -58,12 +59,12 @@ class Bug:
         col = self.position.x
         surrounding_elements = []
 
-        # Проверяем соседние клетки вокруг заданной позиции (row, col)
+        # Check items around bug
         for i in range(row - 2, row + 3):
             for j in range(col - 2, col + 3):
-                # Проверяем, что индексы (i, j) в пределах границ матрицы
+                # Check items to be inside matrix
                 if 0 <= i < rows and 0 <= j < cols:
-                    # Исключаем сам элемент (row, col) из списка окружающих элементов
+                    # Reject self position
                     if (i, j) != (row, col):
                         neighbour = items_map[i][j]
                         match neighbour.name:
@@ -78,6 +79,7 @@ class Bug:
                 else:
                     surrounding_elements.append(0)
         return surrounding_elements
+
 
     def findNearestFreeSpace(self, items_map: []):
         nearest_free_position = []

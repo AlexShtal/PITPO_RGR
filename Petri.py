@@ -42,6 +42,7 @@ class Petri:
                         print(" ", end=" ")
             print()
 
+    # Reads matrix from file
     def readMatrix(self, file_path: str):
 
         with open(file_path) as file:
@@ -65,7 +66,7 @@ class Petri:
                 x_pos = 0
                 y_pos += 1
 
-    # Makes all bugs non acted
+    # Makes all bugs not acted
     def clearActed(self):
         for line in self.items_map:
             for item in line:
@@ -94,9 +95,8 @@ class Petri:
                 if item.name == "Free" and random() < self.food_spawn_rate:
                     self.items_map[item.position.y][item.position.x] = Food(item.position.y, item.position.x)
 
-    # Checks if map empty of bugs
+    # Checks if map is free of bugs
     def isEmpty(self):
-
         flag = True
         for line in self.items_map:
             for item in line:
@@ -104,6 +104,7 @@ class Petri:
                     flag = False
         return flag
 
+    # Main activity
     def run(self):
         while True:
             self.printMatrix()

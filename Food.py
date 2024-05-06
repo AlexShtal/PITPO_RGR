@@ -2,6 +2,7 @@ from Position import Position
 
 from consts import *
 
+
 class Food:
     position: Position
     value = GRASS_VALUE

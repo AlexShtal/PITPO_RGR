@@ -8,6 +8,7 @@ from Actions import Actions
 class DefaultBehavior:
     default_model = None
 
+    # Default behavior model
     @staticmethod
     def GetModel():
         if DefaultBehavior.default_model == None:
