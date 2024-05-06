@@ -1,12 +1,12 @@
 import time
 import os
-from Bug import Bug
 from MeatBug import MeatBug
 from GrassBug import GrassBug
 from Food import Food
 from Free import Free
 from random import random
 
+from consts import *
 
 class Petri:
     items_map = []
@@ -77,14 +77,14 @@ class Petri:
         for line in self.items_map:
             for item in line:
                 if item.name in self.alive_entitys:
-                    item.hunger -= 1
+                    item.hunger -= STARVE_PACE
 
     # Deletes starved bugs
     def clearStarved(self):
         for line in self.items_map:
             for item in line:
                 if item.name in self.alive_entitys:
-                    if item.hunger <= 1:
+                    if item.hunger <= 0:
                         self.items_map[item.position.y][item.position.x] = Free(item.position.y, item.position.x)
 
     # Spawns food
@@ -115,7 +115,7 @@ class Petri:
                 clearConsole()
                 exit(0)
             self.spawnFood()
-            time.sleep(self.simulation_speed)
+            time.sleep(1 / self.simulation_speed)
             clearConsole()
 
 

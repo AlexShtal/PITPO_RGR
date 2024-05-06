@@ -1,10 +1,13 @@
-from random import choice
+from random import choice, random
 import numpy as np
 
 from Bug import Bug
+from MeatBug import MeatBug
 from Free import Free
 
 from Actions import Actions
+
+from consts import *
 
 
 class GrassBug(Bug):
@@ -56,7 +59,7 @@ class GrassBug(Bug):
         surroundings = np.array(self.get_surrounding_elements(items_map))
         possible_actions = self.getPossibleActions(items_map)
 
-        action = self.behavior_model.predict(surroundings.reshape(1, 8))
+        action = self.behavior_model.predict(surroundings.reshape(1, 24))
 
         if not possible_actions:
             return items_map
@@ -97,7 +100,7 @@ class GrassBug(Bug):
             case "Food":
                 items_map[self.position.y][self.position.x] = Free(self.position.x, self.position.y)
                 self.hunger += target.value
-                self.hunger = self.hunger % 20
+                self.hunger = MAX_HUNGER if self.hunger >= MAX_HUNGER else self.hunger
                 self.goToPosition(target.position)
                 items_map[self.position.y][self.position.x] = self
             case "Free":
@@ -106,12 +109,16 @@ class GrassBug(Bug):
                 items_map[self.position.y][self.position.x] = self
 
         # Birth new bug
-        if self.hunger >= 10 or self.pregnant:
+        if self.hunger > MAX_HUNGER / 2 or self.pregnant:
             nearest_free_positions = self.findNearestFreeSpace(items_map)
             if nearest_free_positions:
                 target = choice(nearest_free_positions)
-                items_map[target.y][target.x] = GrassBug(target.x, target.y, self.behavior_model)
-                self.hunger = self.hunger - 5
+                if random() < MEAT_BUG_BIRTH_POSSIBILITY:
+                    items_map[target.y][target.x] = MeatBug(target.x, target.y, self.behavior_model)
+                else:
+                    items_map[target.y][target.x] = GrassBug(target.x, target.y, self.behavior_model)
+
+                self.hunger = self.hunger - MAX_HUNGER / 2
                 self.pregnant = False
             else:
                 self.pregnant = True

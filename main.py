@@ -1,8 +1,8 @@
 from Petri import Petri
 
-SIMULATION_SPEED = 0.5
-FOOD_SPAWN_RATE = 0.01
+from consts import *
+
 
 petri = Petri(SIMULATION_SPEED, FOOD_SPAWN_RATE)
-petri.readMatrix("matrixs/5x5.txt")
+petri.readMatrix("matrixs/55x55singlebug.txt")
 petri.run()

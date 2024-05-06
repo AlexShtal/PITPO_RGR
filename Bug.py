@@ -5,7 +5,7 @@ from Position import Position
 
 from DefaultBehavior import DefaultBehavior
 
-from Actions import Actions
+
 
 
 class Bug:
@@ -24,7 +24,7 @@ class Bug:
 
         if parent_model:
             parent_coefs = parent_model.coefs_
-            model.coefs_ = [array * np.random.normal(1, .1, size=array.shape) for array in parent_coefs]
+            model.coefs_ = [array * np.random.normal(1, .2, size=array.shape) for array in parent_coefs]
 
         self.behavior_model = model
 
@@ -59,8 +59,8 @@ class Bug:
         surrounding_elements = []
 
         # Проверяем соседние клетки вокруг заданной позиции (row, col)
-        for i in range(row - 1, row + 2):
-            for j in range(col - 1, col + 2):
+        for i in range(row - 2, row + 3):
+            for j in range(col - 2, col + 3):
                 # Проверяем, что индексы (i, j) в пределах границ матрицы
                 if 0 <= i < rows and 0 <= j < cols:
                     # Исключаем сам элемент (row, col) из списка окружающих элементов
